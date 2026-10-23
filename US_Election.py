@@ -1,7 +1,7 @@
 
 from pathlib import Path
 import pandas as pd
-#testing to commit
+
 # Load the dataset
 FILE = Path(__file__).with_name("US_Election_dataset_v1.csv")
 
@@ -42,12 +42,9 @@ def clean_data(file_path):
 
         df[col] = pd.to_numeric(values, errors="coerce")
 
-      # Fill missing median income
-    income_col = "Median income (dollars)"
-    missing_income = df[income_col].isna().sum()
-    median_income = df[income_col].median()
-    df[income_col] = df[income_col].fillna(median_income)
-    
+    # Remove the row with missing median income
+    removed_rows = df["Median income (dollars)"].isna().sum()
+    df = df.dropna(subset=["Median income (dollars)"]).copy()
 
     # Recalculate voting percentages
     vote_cols = [raw for raw, pct in VOTE_COLUMNS]
@@ -77,8 +74,7 @@ def clean_data(file_path):
     print(f"Original: {old_rows:,} rows, {old_cols} columns")
     print(f"Cleaned: {len(df):,} rows, {len(df.columns)} columns")
     print(f"Duplicate counties: {duplicates}")
-    print(f"Missing income values filled: {missing_income}")
-    print(f"Median income used: ${median_income:,.2f}")
+    print(f"Rows removed (missing median income): {removed_rows}")
 
     print("\nMissing values:")
     missing = df.isna().sum()
