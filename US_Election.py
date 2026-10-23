@@ -42,6 +42,13 @@ def clean_data(file_path):
 
         df[col] = pd.to_numeric(values, errors="coerce")
 
+      # Fill missing median income
+    income_col = "Median income (dollars)"
+    missing_income = df[income_col].isna().sum()
+    median_income = df[income_col].median()
+    df[income_col] = df[income_col].fillna(median_income)
+    
+
     # Recalculate voting percentages
     vote_cols = [raw for raw, pct in VOTE_COLUMNS]
     pct_cols = [pct for raw, pct in VOTE_COLUMNS]
@@ -70,6 +77,8 @@ def clean_data(file_path):
     print(f"Original: {old_rows:,} rows, {old_cols} columns")
     print(f"Cleaned: {len(df):,} rows, {len(df.columns)} columns")
     print(f"Duplicate counties: {duplicates}")
+    print(f"Missing income values filled: {missing_income}")
+    print(f"Median income used: ${median_income:,.2f}")
 
     print("\nMissing values:")
     missing = df.isna().sum()
